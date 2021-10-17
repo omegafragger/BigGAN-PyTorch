@@ -31,7 +31,7 @@ def prepare_parser():
   usage = 'Parser for all scripts.'
   parser = ArgumentParser(description=usage)
   
-  ### Dataset/Dataloader stuff ###
+  ### Dataset/Dataloader/Ensemble loader stuff ###
   parser.add_argument(
     '--dataset', type=str, default='I128_hdf5',
     help='Which Dataset to train on, out of I128, I256, C10, C100;'
@@ -56,7 +56,9 @@ def prepare_parser():
   parser.add_argument(
     '--use_multiepoch_sampler', action='store_true', default=False,
     help='Use the multi-epoch sampler for dataloader? (default: %(default)s)')
-  
+  parser.add_argument(
+    '--ensemble_path', type=str, default='./',
+    help='Path to load the ensemble')
   
   ### Model stuff ###
   parser.add_argument(
@@ -359,7 +361,16 @@ def prepare_parser():
     '--sv_log_interval', type=int, default=10,
     help='Iteration interval for logging singular values '
          ' (default: %(default)s)') 
-   
+
+  ### Regularizer stuff ###
+  parser.add_argument(
+    '--lamda1', type=float, default=1.0,
+    help='Regularization coefficient for perceptual loss')
+
+  parser.add_argument(
+    '--lamda2', type=float, default=1.0,
+    help='Regularization coefficient for semantic loss')
+
   return parser
 
 # Arguments for sample.py; not presently used in train.py

@@ -29,6 +29,16 @@ import losses
 import train_fns
 from sync_batchnorm import patch_replication_callback
 
+from net.densenet import densenet121
+from net.inception import inceptionv3
+from net.resnet import resnet50, resnet110
+from net.vgg import vgg16
+from net.wide_resnet import wrn_28_10
+from losses import EnsembleLosses
+
+import lpips
+
+
 # The main training file. Config is a dictionary specifying the configuration
 # of this training run.
 def run(config):
@@ -63,6 +73,32 @@ def run(config):
   experiment_name = (config['experiment_name'] if config['experiment_name']
                        else utils.name_from_config(config))
   print('Experiment name is %s' % experiment_name)
+
+  # Next prepare the ensemble loss to serve as semantic loss
+  densenet_model = densenet121().to(device)
+  inception_model = inceptionv3().to(device)
+  resnet50_model = resnet50().to(device)
+  resnet110_model = resnet110().to(device)
+  vgg16_model = vgg16().to(device)
+  wide_resnet_model = wrn_28_10().to(device)
+
+  densenet_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'densenet121_1_350.model')))
+  inception_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'inception_v3_1_350.model')))
+  resnet50_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'resnet50_1_350.model')))
+  resnet110_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'resnet110_1_350.model')))
+  vgg16_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'vgg16_1_350.model')))
+  wide_resnet_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'wide_resnet_1_350.model')))
+  ensemble = [
+    densenet_model,
+    inception_model,
+    resnet50_model,
+    resnet110_model,
+    vgg16_model,
+    wide_resnet_model
+  ]
+
+  ensemble_loss = EnsembleLosses(ensemble).to(device)
+  perceptual_loss = lpips.LPIPS(net='vgg').to(device)
 
   # Next, build the model
   G = model.Generator(**config).to(device)
@@ -150,7 +186,8 @@ def run(config):
   # Loaders are loaded, prepare the training function
   if config['which_train_fn'] == 'GAN':
     train = train_fns.GAN_training_function(G, D, GD, z_, y_, 
-                                            ema, state_dict, config)
+                                            ema, state_dict, ensemble_loss,
+                                            perceptual_loss, config)
   # Else, assume debugging and use the dummy train fn
   else:
     train = train_fns.dummy_training_function()

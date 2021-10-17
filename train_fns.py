@@ -17,13 +17,15 @@ def dummy_training_function():
   return train
 
 
-def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
+def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, ensemble_loss, perceptual_vgg_loss, config):
   def train(x, y):
     G.optim.zero_grad()
     D.optim.zero_grad()
     # How many chunks to split x and y into?
     x = torch.split(x, config['batch_size'])
     y = torch.split(y, config['batch_size'])
+    l1 = config['lamda1']
+    l2 = config['lamda2']
     counter = 0
     
     # Optionally toggle D and G's "require_grad"
@@ -68,8 +70,15 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     for accumulation_index in range(config['num_G_accumulations']):    
       z_.sample_()
       y_.sample_()
-      D_fake = GD(z_, y_, train_G=True, split_D=config['split_D'])
-      G_loss = losses.generator_loss(D_fake) / float(config['num_G_accumulations'])
+      D_fake, G_z = GD(z_, y_, train_G=True, split_D=config['split_D'], return_G_z=True)
+
+      generator_loss = losses.generator_loss(D_fake)
+      semantic_loss = ensemble_loss.mutual_information(ensemble_loss.get_softmax(G_z))
+      perceptual_loss = perceptual_vgg_loss(G_z, x)
+
+      total_loss = generator_loss + (l1 * perceptual_loss) - (l2 * semantic_loss) 
+
+      G_loss = total_loss / float(config['num_G_accumulations'])
       G_loss.backward()
     
     # Optionally apply modified ortho reg in G
