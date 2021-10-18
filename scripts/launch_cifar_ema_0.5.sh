@@ -22,4 +22,5 @@ CUDA_VISIBLE_DEVICES=0,1 python train.py \
 --ema --use_ema --ema_start 1000 \
 --test_every 5000 --save_every 2000 --num_best_copies 5 --num_save_copies 2 --seed 0 \
 --ensemble_path /data/coml-ecr/shug5721/ensemble/ --lamda1 1.0 --lamda2 0.5 \
---weights_root /data/coml-ecr/shug5721/biggan_models/biggan_cifar_0.5
+--weights_root /data/coml-ecr/shug5721/biggan_models/biggan_cifar_0.5/weights \
+--samples_root /data/coml-ecr/shug5721/biggan_models/biggan_cifar_0.5/samples
