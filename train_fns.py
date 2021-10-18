@@ -74,7 +74,7 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, ensemble_loss, perc
 
       generator_loss = losses.generator_loss(D_fake)
       semantic_loss = ensemble_loss.mutual_information(ensemble_loss.get_softmax(G_z))
-      perceptual_loss = perceptual_vgg_loss(G_z, x)
+      perceptual_loss = perceptual_vgg_loss(G_z, x[0])
 
       total_loss = generator_loss + (l1 * perceptual_loss) - (l2 * semantic_loss) 
 
