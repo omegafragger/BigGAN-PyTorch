@@ -29,13 +29,11 @@ import losses
 import train_fns
 from sync_batchnorm import patch_replication_callback
 
-# from net.densenet import densenet121
-# from net.inception import inceptionv3
-# from net.resnet import resnet50, resnet110
-# from net.vgg import vgg16
-# from net.wide_resnet import wrn_28_10
-import torchvision.models as models
-
+from net.densenet import densenet121
+from net.inception import inceptionv3
+from net.resnet import resnet50, resnet110
+from net.vgg import vgg16
+from net.wide_resnet import wrn_28_10
 from losses import EnsembleLosses
 
 import lpips
@@ -77,17 +75,25 @@ def run(config):
   print('Experiment name is %s' % experiment_name)
 
   # Next prepare the ensemble loss to serve as semantic loss
-  resnet50_model = models.resnet50(pretrained=True).to(device)
-  resnet101_model = models.resnet101(pretrained=True).to(device)
-  densenet161_model = models.densenet161(pretrained=True).to(device)
-  inception_model = models.inception_v3(pretrained=True).to(device)
-  wide_resnet_model = models.wide_resnet50_2(pretrained=True).to(device)
+  densenet_model = densenet121().to(device)
+  inception_model = inceptionv3().to(device)
+  resnet50_model = resnet50().to(device)
+  resnet110_model = resnet110().to(device)
+  vgg16_model = vgg16().to(device)
+  wide_resnet_model = wrn_28_10().to(device)
 
+  densenet_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'densenet121_1_350.model')))
+  inception_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'inception_v3_1_350.model')))
+  resnet50_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'resnet50_1_350.model')))
+  resnet110_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'resnet110_1_350.model')))
+  vgg16_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'vgg16_1_350.model')))
+  wide_resnet_model.load_state_dict(torch.load(os.path.join(config['ensemble_path'], 'wide_resnet_1_350.model')))
   ensemble = [
-    resnet50_model,
-    resnet101_model,
-    densenet161_model,
+    densenet_model,
     inception_model,
+    resnet50_model,
+    resnet110_model,
+    vgg16_model,
     wide_resnet_model
   ]
 
