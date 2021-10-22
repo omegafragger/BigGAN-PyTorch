@@ -1,1 +1,6 @@
 samples
+weights
+*.npz
+__pycache__
+data
+*/__pycache__

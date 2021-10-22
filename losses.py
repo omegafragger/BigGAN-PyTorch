@@ -2,6 +2,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+from torchvision import datasets, models, transforms
+
 # DCGAN loss
 def loss_dcgan_dis(dis_fake, dis_real):
   L1 = torch.mean(F.softplus(-dis_real))
@@ -48,6 +50,17 @@ class EnsembleLosses(nn.Module):
     '''
     Computes the softmax distribution from each component of the ensemble for a given input batch.
     '''
+
+    # NOTE: The following code is for training ImageNet models only!!!
+    input = (input * 0.5) + 0.5
+    # Now normalize to the range required
+
+    data_transforms = transforms.Compose([
+      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+
+    input = data_transforms(input)
+
     logits = []
     for classifier in self.ensemble:
       logits.append(classifier(input))
