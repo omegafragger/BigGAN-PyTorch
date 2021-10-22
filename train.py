@@ -80,15 +80,16 @@ def run(config):
   resnet50_model = models.resnet50(pretrained=True).to(device)
   resnet101_model = models.resnet101(pretrained=True).to(device)
   densenet161_model = models.densenet161(pretrained=True).to(device)
-  inception_model = models.inception_v3(pretrained=True).to(device)
-  wide_resnet_model = models.wide_resnet50_2(pretrained=True).to(device)
+  # inception_model = models.inception_v3(pretrained=True).to(device)
+  wide_resnet_50_2_model = models.wide_resnet50_2(pretrained=True).to(device)
+  wide_resnet_101_2_model = models.wide_resnet101_2(pretrained=True).to(device)
 
   ensemble = [
     resnet50_model,
     resnet101_model,
     densenet161_model,
-    inception_model,
-    wide_resnet_model
+    wide_resnet_50_2_model,
+    wide_resnet_101_2_model
   ]
 
   ensemble_loss = EnsembleLosses(ensemble).to(device)
