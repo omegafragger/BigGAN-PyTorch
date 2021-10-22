@@ -106,16 +106,16 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, ensemble_loss, perc
     a fixed noise seed (to show how the model evolves throughout training),
     a set of full conditional sample sheets, and a set of interp sheets. '''
 def save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y, 
-                    state_dict, config, experiment_name):
+                    state_dict, config, experiment_name, epoch):
   utils.save_weights(G, D, state_dict, config['weights_root'],
-                     experiment_name, None, G_ema if config['ema'] else None)
+                     experiment_name, None, G_ema if config['ema'] else None, epoch)
   # Save an additional copy to mitigate accidental corruption if process
   # is killed during a save (it's happened to me before -.-)
   if config['num_save_copies'] > 0:
     utils.save_weights(G, D, state_dict, config['weights_root'],
                        experiment_name,
                        'copy%d' %  state_dict['save_num'],
-                       G_ema if config['ema'] else None)
+                       G_ema if config['ema'] else None, epoch)
     state_dict['save_num'] = (state_dict['save_num'] + 1 ) % config['num_save_copies']
     
   # Use EMA G for samples or non-EMA?

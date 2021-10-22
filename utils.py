@@ -696,7 +696,7 @@ def join_strings(base_string, strings):
 
 # Save a model's weights, optimizer, and the state_dict
 def save_weights(G, D, state_dict, weights_root, experiment_name, 
-                 name_suffix=None, G_ema=None):
+                 name_suffix=None, G_ema=None, epoch=0):
   root = '/'.join([weights_root, experiment_name])
   if not os.path.exists(root):
     os.mkdir(root)
@@ -705,18 +705,18 @@ def save_weights(G, D, state_dict, weights_root, experiment_name,
   else:
     print('Saving weights to %s...' % root)
   torch.save(G.state_dict(), 
-              '%s/%s.pth' % (root, join_strings('_', ['G', name_suffix])))
+              '%s/%s.pth' % (root, join_strings('_', ['G', name_suffix, str(epoch) if epoch != 0 else None])))
   torch.save(G.optim.state_dict(), 
-              '%s/%s.pth' % (root, join_strings('_', ['G_optim', name_suffix])))
+              '%s/%s.pth' % (root, join_strings('_', ['G_optim', name_suffix, str(epoch) if epoch != 0 else None])))
   torch.save(D.state_dict(), 
-              '%s/%s.pth' % (root, join_strings('_', ['D', name_suffix])))
+              '%s/%s.pth' % (root, join_strings('_', ['D', name_suffix, str(epoch) if epoch != 0 else None])))
   torch.save(D.optim.state_dict(),
-              '%s/%s.pth' % (root, join_strings('_', ['D_optim', name_suffix])))
+              '%s/%s.pth' % (root, join_strings('_', ['D_optim', name_suffix, str(epoch) if epoch != 0 else None])))
   torch.save(state_dict,
-              '%s/%s.pth' % (root, join_strings('_', ['state_dict', name_suffix])))
+              '%s/%s.pth' % (root, join_strings('_', ['state_dict', name_suffix, str(epoch) if epoch != 0 else None])))
   if G_ema is not None:
     torch.save(G_ema.state_dict(), 
-                '%s/%s.pth' % (root, join_strings('_', ['G_ema', name_suffix])))
+                '%s/%s.pth' % (root, join_strings('_', ['G_ema', name_suffix, str(epoch) if epoch != 0 else None])))
 
 
 # Load a model's weights, optimizer, and the state_dict

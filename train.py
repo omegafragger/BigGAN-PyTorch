@@ -228,14 +228,13 @@ def run(config):
                            for key in metrics]), end=' ')
 
       # Save weights and copies as configured at specified interval
-      if not (state_dict['itr'] % config['save_every']):
-        if config['G_eval_mode']:
-          print('Switchin G to eval mode...')
-          G.eval()
-          if config['ema']:
-            G_ema.eval()
-        train_fns.save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y, 
-                                  state_dict, config, experiment_name)
+      if config['G_eval_mode']:
+        print('Switchin G to eval mode...')
+        G.eval()
+        if config['ema']:
+          G_ema.eval()
+      train_fns.save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y, 
+                                state_dict, config, experiment_name, epoch)
 
       # Test every specified interval
       if not (state_dict['itr'] % config['test_every']):
