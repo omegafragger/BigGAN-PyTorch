@@ -51,15 +51,15 @@ class EnsembleLosses(nn.Module):
     Computes the softmax distribution from each component of the ensemble for a given input batch.
     '''
 
-    # NOTE: The following code is for training ImageNet models only!!!
-    input = (input * 0.5) + 0.5
-    # Now normalize to the range required
+    # # NOTE: The following code is for training ImageNet models only!!!
+    # input = (input * 0.5) + 0.5
+    # # Now normalize to the range required
 
-    data_transforms = transforms.Compose([
-      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
+    # data_transforms = transforms.Compose([
+    #   transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    # ])
 
-    input = data_transforms(input)
+    # input = data_transforms(input)
 
     logits = []
     for classifier in self.ensemble:

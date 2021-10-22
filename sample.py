@@ -38,7 +38,7 @@ def run(config):
       if item not in ['z_var', 'base_root', 'batch_size', 'G_batch_size', 'use_ema', 'G_eval_mode']:
         config[item] = state_dict['config'][item]
   
-  # update config (see train.py for explanation)
+  # update config (see train_cifar.py for explanation)
   config['resolution'] = utils.imsize_dict[config['dataset']]
   config['n_classes'] = utils.nclass_dict[config['dataset']]
   config['G_activation'] = utils.activation_dict[config['G_nl']]
